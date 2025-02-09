@@ -2,6 +2,9 @@ package com.melita.AuthService.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,42 +14,68 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-    @Value("${spring.security.jwt.secret}")
-    private String secret;
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    @Value("${spring.security.jwt.expiration}")
-    private long expiration;
+    @Value("${jwt.expiration}")
+    private long jwtExpiration;
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
     public String generateToken(String username) {
+        logger.info("Generating token for user: {}", username);
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            logger.info("Validating token");
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (JwtException e) {
+            logger.error("Invalid token: {}", e.getMessage());
             return false;
         }
     }
 
     public String extractUsername(String token) {
+        logger.info("Extracting username from token");
         return extractClaim(token, Claims::getSubject);
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token).getBody();
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
+    }
+
+    public Claims extractAllClaims(String token) {
+        logger.info("Extracting all claims from token");
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public String getTokenFromRequest(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            logger.info("Extracting token from request header");
+            return header.substring(7);
+        }
+        logger.warn("No Authorization header found or it does not start with 'Bearer '");
+        return null;
     }
 }

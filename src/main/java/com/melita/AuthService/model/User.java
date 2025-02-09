@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.Set;
 
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,4 +25,9 @@ public class User {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles;
+
+    public User(String testUser, String rawPassword) {
+        this.username = testUser;
+        this.password = rawPassword;
+    }
 }
