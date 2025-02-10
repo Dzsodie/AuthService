@@ -37,20 +37,34 @@ auth-service/
 ├──src/test/java/com/melita/authservice
 ```
 ## Installation
-Clone the repository from GitHub.
-```shell
-git clone  https://github.com/Dzsodie/AuthService.git
-```
+1. Pre-requisites
+   Install Java17, PostgreSQL DB. Test the DB connection.
+2. Clone the repository from GitHub.
+    ```shell
+    git clone  https://github.com/Dzsodie/AuthService.git
+    ```
 ## Starting the application
-Start the service with the following command.
-```shell
-mvn spring-boot:run
-```
+1. First start the Config Service https://github.com/Dzsodie/ConfigService.git .
+2. Check if the properties are loaded from config service properly.
+   http://localhost:8888/AuthService/default
+3. Start the service with the following command.
+    ```shell
+    mvn spring-boot:run
+    ```
 ## API documentation
 Swagger documentation is available at: http://localhost:8080/swagger/index.html after the application started successfully.
 ## Logging and monitoring
-
+SLF4J is used for logging.
+Log aggregation is not yet implemented, but Datadog offers an easy to implement solution with user-friendly monitoring interface.
 ## Testing
-
+1. Mockito and JUnit5 is used for the unit testing.
+2. Test coverage needs to be improved. Coverage report can be reached with this command.
+    ```shell
+    mvn jacoco:report
+    ```
+3. Tests can be run with the following command.
+    ```shell
+    mvn test
+    ```
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
