@@ -14,6 +14,7 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     @Value("${jwt.secret}")
@@ -38,7 +39,6 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            logger.info("Validating token");
             Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
@@ -51,7 +51,6 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        logger.info("Extracting username from token");
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -61,7 +60,6 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        logger.info("Extracting all claims from token");
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
@@ -72,10 +70,8 @@ public class JwtUtil {
     public String getTokenFromRequest(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
-            logger.info("Extracting token from request header");
             return header.substring(7);
         }
-        logger.warn("No Authorization header found or it does not start with 'Bearer '");
         return null;
     }
 }
