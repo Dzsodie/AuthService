@@ -3,7 +3,7 @@ package com.melita.AuthService;
 import com.melita.AuthService.model.User;
 import com.melita.AuthService.repository.UserRepository;
 import com.melita.AuthService.security.JwtUtil;
-import com.melita.AuthService.service.AuthService;
+import com.melita.AuthService.service.AuthServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuthServiceTest {
+class AuthServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -31,7 +31,7 @@ class AuthServiceTest {
     private JwtUtil jwtUtil;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authServiceImpl;
 
     private User testUser;
 
@@ -48,7 +48,7 @@ class AuthServiceTest {
         when(passwordEncoder.matches("rawPassword", "encodedPassword")).thenReturn(true);
         when(jwtUtil.generateToken("testUser")).thenReturn("mockedToken");
 
-        String token = authService.login("testUser", "rawPassword");
+        String token = authServiceImpl.login("testUser", "rawPassword");
 
         assertEquals("mockedToken", token);
         verify(userRepository).findByUsername("testUser");
@@ -61,14 +61,14 @@ class AuthServiceTest {
         when(userRepository.findByUsername("testUser")).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches("wrongPassword", "encodedPassword")).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> authService.login("testUser", "wrongPassword"));
+        assertThrows(RuntimeException.class, () -> authServiceImpl.login("testUser", "wrongPassword"));
     }
 
     @Test
     void testLogin_UserNotFound() {
         when(userRepository.findByUsername("unknownUser")).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> authService.login("unknownUser", "password"));
+        assertThrows(RuntimeException.class, () -> authServiceImpl.login("unknownUser", "password"));
     }
 
     @Test
@@ -76,7 +76,7 @@ class AuthServiceTest {
         when(passwordEncoder.encode("rawPassword")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
-        User savedUser = authService.register(new User("testUser", "rawPassword"));
+        User savedUser = authServiceImpl.register(new User("testUser", "rawPassword"));
 
         assertNotNull(savedUser);
         assertEquals("testUser", savedUser.getUsername());
@@ -86,7 +86,7 @@ class AuthServiceTest {
 
     @Test
     void testLoadUserByUsername_Admin() {
-        var userDetails = authService.loadUserByUsername("admin");
+        var userDetails = authServiceImpl.loadUserByUsername("admin");
 
         assertNotNull(userDetails);
         assertEquals("admin", userDetails.getUsername());
@@ -94,6 +94,6 @@ class AuthServiceTest {
 
     @Test
     void testLoadUserByUsername_NotFound() {
-        assertThrows(UsernameNotFoundException.class, () -> authService.loadUserByUsername("unknownUser"));
+        assertThrows(UsernameNotFoundException.class, () -> authServiceImpl.loadUserByUsername("unknownUser"));
     }
 }

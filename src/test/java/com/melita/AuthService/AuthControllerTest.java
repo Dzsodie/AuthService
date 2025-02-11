@@ -2,7 +2,7 @@ package com.melita.AuthService;
 
 import com.melita.AuthService.controller.AuthController;
 import com.melita.AuthService.model.User;
-import com.melita.AuthService.service.AuthService;
+import com.melita.AuthService.service.AuthServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ class AuthControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private AuthService authService;
+    private AuthServiceImpl authServiceImpl;
 
     @InjectMocks
     private AuthController authController;
@@ -42,7 +42,7 @@ class AuthControllerTest {
         user.setUsername("testuser");
         user.setPassword("password123");
 
-        when(authService.register(any(User.class))).thenReturn(user);
+        when(authServiceImpl.register(any(User.class))).thenReturn(user);
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -53,7 +53,7 @@ class AuthControllerTest {
 
     @Test
     void testLogin() throws Exception {
-        when(authService.login(eq("testuser"), eq("password123"))).thenReturn("mockToken123");
+        when(authServiceImpl.login(eq("testuser"), eq("password123"))).thenReturn("mockToken123");
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
