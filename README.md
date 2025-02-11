@@ -21,19 +21,20 @@ This project is a demo for the Melita interview process, it's main purpose is to
 - validates authentication 
 - provides user details
 ## Service structure
-```
-auth-service/
-├── src/main/java/com/melita/authservice
-│   │   ├── config/
-│   │   ├── controller/
-│   │   ├── model/
-│   │   ├── repository/
-│   │   ├── security/
-│   │   ├── service/
-│   ├─── resources/
-│       ├── application.yml
-├──src/test/java/com/melita/authservice
-```
+   ```
+   auth-service/
+   ├── src/main/java/com/melita/authservice
+   │   │   ├── config/
+   │   │   ├── controller/
+   │   │   ├── model/
+   │   │   ├── repository/
+   │   │   ├── security/
+   │   │   ├── service/
+   │   ├─── resources/
+   │       ├── application.yml
+   │       ├── bootstrap.yml
+   ├──src/test/java/com/melita/authservice
+   ```
 ## Installation
 1. Pre-requisites
    Install Java17, PostgreSQL DB. Test the DB connection.
